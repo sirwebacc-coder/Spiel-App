@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#10131c">
   <title>Spielraum</title>
-  <style>
+ <style>
     :root {
       color-scheme: dark;
       --bg: #10131c;
@@ -289,6 +289,49 @@
       .card p { margin-top: 4px; }
       .panel { padding: 16px; }
     }
+   
+/* TIC-TAC-TOE */
+.tic-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+  margin: 24px auto;
+}
+
+.tic-cell {
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line, #dedbd5);
+  border-radius: 16px;
+  background: var(--card, #ffffff);
+  color: var(--text, #242424);
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tic-cell:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.tic-cell:focus-visible {
+  outline: 3px solid #8b7355;
+  outline-offset: 3px;
+}
+
+#ticRestart {
+  display: block;
+  margin: 0 auto;
+}
+
   </style>
 </head>
 <body>
@@ -421,6 +464,28 @@
       </div>
     </section>
 
+    <!-- TIC-TAC-TOE -->
+    <section id="ticTacToe" class="hidden">
+      <button class="back" id="ticBack">← Spielmenü</button>
+      <div class="eyebrow">Tic-Tac-Toe</div>
+      <h1>Dein Zug.</h1>
+      <p id="ticStatus">Spieler X ist an der Reihe.</p>
+
+      <div id="ticBoard" class="tic-board">
+        <button class="tic-cell" data-cell="0"></button>
+        <button class="tic-cell" data-cell="1"></button>
+        <button class="tic-cell" data-cell="2"></button>
+        <button class="tic-cell" data-cell="3"></button>
+        <button class="tic-cell" data-cell="4"></button>
+        <button class="tic-cell" data-cell="5"></button>
+        <button class="tic-cell" data-cell="6"></button>
+        <button class="tic-cell" data-cell="7"></button>
+        <button class="tic-cell" data-cell="8"></button>
+      </div>
+
+      <button id="ticRestart">Neue Runde</button>
+    </section>
+
     <!-- ANDERE SPIELE -->
     <section id="coming" class="hidden">
       <button class="back" id="comingBack">← Alle Spiele</button>
@@ -436,13 +501,15 @@
   </main>
 
   <script>
-    const screens = {
-      home: document.getElementById("home"),
-      mode: document.getElementById("mode"),
-      setup: document.getElementById("setup"),
-      play: document.getElementById("play"),
-      coming: document.getElementById("coming")
-    };
+    
+const screens = {
+  home: document.getElementById("home"),
+  mode: document.getElementById("mode"),
+  setup: document.getElementById("setup"),
+  play: document.getElementById("play"),
+  ticTacToe: document.getElementById("ticTacToe"),
+  coming: document.getElementById("coming")
+};
 
     const modeTitle = document.getElementById("modeTitle");
     const modeNotice = document.getElementById("modeNotice");
@@ -457,6 +524,92 @@
     let currentPlayer = 1;
     let finished = false;
     let selectedGame = "chocolate";
+
+    // TIC-TAC-TOE: SPIELLOGIK
+    const ticCells = document.querySelectorAll(".tic-cell");
+    const ticStatus = document.getElementById("ticStatus");
+
+    let ticBoard = Array(9).fill("");
+    let ticCurrent = "X";
+    let ticFinished = false;
+
+    const ticWinPatterns = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    function ticNewGame() {
+      ticBoard = Array(9).fill("");
+      ticCurrent = "X";
+      ticFinished = false;
+      ticRender();
+    }
+
+    function ticRender() {
+      ticCells.forEach((cell, index) => {
+        cell.textContent = ticBoard[index];
+        cell.disabled = ticFinished || ticBoard[index] !== "";
+        cell.setAttribute(
+          "aria-label",
+          ticBoard[index]
+            ? `Feld ${index + 1}: ${ticBoard[index]}`
+            : `Feld ${index + 1}: leer`
+        );
+      });
+
+      if (!ticFinished) {
+        ticStatus.textContent = `Spieler ${ticCurrent} ist am Zug.`;
+      }
+    }
+
+    function ticPlay(index) {
+      if (ticFinished || ticBoard[index] !== "") return;
+
+      ticBoard[index] = ticCurrent;
+
+      const won = ticWinPatterns.some(pattern =>
+        pattern.every(position => ticBoard[position] === ticCurrent)
+      );
+
+      if (won) {
+        ticFinished = true;
+        ticRender();
+        ticStatus.textContent = `Spieler ${ticCurrent} gewinnt!`;
+        return;
+      }
+
+      if (ticBoard.every(cell => cell !== "")) {
+        ticFinished = true;
+        ticRender();
+        ticStatus.textContent = "Unentschieden!";
+        return;
+      }
+
+      ticCurrent = ticCurrent === "X" ? "O" : "X";
+      ticRender();
+    }
+
+    ticCells.forEach((cell, index) => {
+      cell.addEventListener("click", () => ticPlay(index));
+    });
+
+    document.getElementById("ticRestart").addEventListener(
+      "click",
+      ticNewGame
+    );
+
+    document.getElementById("ticBack").addEventListener(
+      "click",
+      () => showScreen("home")
+    );
+
+    ticRender();
 
     function showScreen(name) {
       Object.values(screens).forEach(screen => {
