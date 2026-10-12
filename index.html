@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#10131c">
   <title>Spielraum</title>
- <style>
+
+  <style>
     :root {
       color-scheme: dark;
       --bg: #10131c;
@@ -29,13 +30,12 @@
     }
 
     button, input { font: inherit; }
+    button { cursor: pointer; }
 
     button:focus-visible, input:focus-visible {
       outline: 3px solid var(--accent);
       outline-offset: 3px;
     }
-
-    button { cursor: pointer; }
 
     .app {
       width: min(100% - 28px, 850px);
@@ -66,26 +66,9 @@
       line-height: 1.1;
     }
 
-    h2 {
-      margin: 0 0 10px;
-      font-size: 21px;
-    }
-
-    h3 {
-      margin: 0 0 8px;
-      font-size: 17px;
-    }
-
-    p {
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    .muted { color: var(--muted); }
-
-    .small {
-      font-size: 13px;
-    }
+    h2 { margin: 0 0 10px; font-size: 21px; }
+    p { color: var(--muted); line-height: 1.65; }
+    .small { font-size: 13px; }
 
     .grid {
       display: grid;
@@ -104,14 +87,9 @@
       text-align: left;
     }
 
-    button.card:hover:not(:disabled) {
+    .card:hover {
       background: #242b3b;
       border-color: #55506f;
-    }
-
-    .card:disabled {
-      cursor: not-allowed;
-      opacity: .55;
     }
 
     .game-icon {
@@ -120,10 +98,7 @@
       font-size: 30px;
     }
 
-    .card p {
-      margin-bottom: 0;
-      font-size: 13px;
-    }
+    .card p { margin-bottom: 0; font-size: 13px; }
 
     .panel {
       margin-top: 22px;
@@ -165,8 +140,6 @@
       margin-bottom: 28px;
     }
 
-    .back:hover { color: var(--text); }
-
     .hidden { display: none !important; }
 
     .settings {
@@ -194,10 +167,10 @@
       color: var(--text);
     }
 
-    .status {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 13px;
+    .status, .notice {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
       background: #25223a;
       line-height: 1.6;
     }
@@ -237,12 +210,6 @@
     .cell.poison {
       background: var(--danger);
       color: #2c1019;
-      box-shadow: inset 0 -4px rgba(70, 0, 15, .2);
-    }
-
-    .cell.poison:disabled {
-      cursor: not-allowed;
-      opacity: 1;
     }
 
     .cell.gone {
@@ -256,13 +223,36 @@
       line-height: 1.8;
     }
 
-    .notice {
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 12px;
-      background: #25223a;
-      line-height: 1.6;
+    /* Tic-Tac-Toe */
+    .tic-board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      width: 100%;
+      max-width: 360px;
+      margin: 24px auto;
     }
+
+    .tic-cell {
+      aspect-ratio: 1;
+      min-width: 0;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
+      color: var(--text);
+      font-size: clamp(2.5rem, 12vw, 4rem);
+      font-weight: 700;
+    }
+
+    .tic-cell:not(:disabled):hover {
+      background: #242b3b;
+      border-color: var(--accent);
+    }
+
+    .tic-cell:disabled { cursor: default; }
+
+    #ticRestart { display: block; margin: 0 auto; }
 
     footer {
       margin-top: 38px;
@@ -289,516 +279,400 @@
       .card p { margin-top: 4px; }
       .panel { padding: 16px; }
     }
-   
-/* TIC-TAC-TOE */
-.tic-board {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  width: 100%;
-  max-width: 360px;
-  margin: 24px auto;
-}
-
-.tic-cell {
-  aspect-ratio: 1 / 1;
-  border: 1px solid var(--line, #dedbd5);
-  border-radius: 16px;
-  background: var(--card, #ffffff);
-  color: var(--text, #242424);
-  font-size: clamp(2.5rem, 12vw, 4rem);
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tic-cell:disabled {
-  cursor: default;
-  opacity: 1;
-}
-
-.tic-cell:focus-visible {
-  outline: 3px solid #8b7355;
-  outline-offset: 3px;
-}
-
-#ticRestart {
-  display: block;
-  margin: 0 auto;
-}
-
   </style>
 </head>
+
 <body>
-  <main class="app">
-    <div class="brand">Spielraum</div>
+<main class="app">
+  <div class="brand">Spielraum</div>
 
-    <!-- STARTSEITE -->
-    <section id="home">
-      <div class="eyebrow">Dein nächstes Spiel wartet</div>
-      <h1>Einfach spielen.</h1>
-      <p>
-        Entdecke Spiele, fordere Freunde heraus
-        und verbessere deine Strategien.
-      </p>
+  <!-- STARTSEITE -->
+  <section id="home">
+    <div class="eyebrow">Dein nächstes Spiel wartet</div>
+    <h1>Einfach spielen.</h1>
+    <p>Entdecke Spiele, fordere Freunde heraus und verbessere deine Strategien.</p>
 
-      <div class="grid">
-        <button class="card" data-game="chocolate">
-          <span class="game-icon">🍫</span>
-          <strong>Schokoladenspiel</strong>
-          <p>Wähle mit Bedacht. Meide das Giftfeld.</p>
-        </button>
+    <div class="grid">
+      <button class="card" data-game="chocolate">
+        <span class="game-icon">🍫</span>
+        <strong>Schokoladenspiel</strong>
+        <p>Wähle mit Bedacht. Meide das Giftfeld.</p>
+      </button>
 
-        <button class="card" data-game="tictactoe">
-          <span class="game-icon">✕ ○</span>
-          <strong>Tic-Tac-Toe</strong>
-          <p>Drei in einer Reihe.</p>
-        </button>
+      <button class="card" data-game="tictactoe">
+        <span class="game-icon">✕ ○</span>
+        <strong>Tic-Tac-Toe</strong>
+        <p>Drei in einer Reihe.</p>
+      </button>
 
-        <button class="card" data-game="connect4">
-          <span class="game-icon">🔴</span>
-          <strong>Vier Gewinnt</strong>
-          <p>Verbinde vier Steine.</p>
-        </button>
+      <button class="card" data-game="connect4">
+        <span class="game-icon">🔴</span>
+        <strong>Vier Gewinnt</strong>
+        <p>Verbinde vier Steine.</p>
+      </button>
+    </div>
+  </section>
+
+  <!-- SPIELMODUS -->
+  <section id="mode" class="hidden">
+    <button class="back" id="modeBack">← Alle Spiele</button>
+    <div class="eyebrow">Spiel auswählen</div>
+    <h1 id="modeTitle">Schokoladenspiel</h1>
+    <p>Wie möchtest du spielen?</p>
+
+    <div class="grid">
+      <button class="card" id="localMode">
+        <span class="game-icon">👥</span>
+        <strong>Zu zweit</strong>
+        <p>Zwei Spieler an einem Gerät.</p>
+      </button>
+
+      <button class="card" id="botMode">
+        <span class="game-icon">🤖</span>
+        <strong>Gegen Bot</strong>
+        <p>Schwierigkeitsgrade folgen später.</p>
+      </button>
+
+      <button class="card" id="onlineMode" disabled>
+        <span class="game-icon">🌐</span>
+        <strong>Online per Code</strong>
+        <p>Noch in Entwicklung.</p>
+      </button>
+    </div>
+
+    <div id="modeNotice" class="notice hidden"></div>
+  </section>
+
+  <!-- SCHOKOLADENSPIEL EINSTELLUNGEN -->
+  <section id="setup" class="hidden">
+    <button class="back" id="setupBack">← Spielmodus</button>
+    <div class="eyebrow">Spiel vorbereiten</div>
+    <h1>Schokoladenspiel</h1>
+    <p>Lege die Größe des Spielfeldes fest.</p>
+
+    <div class="panel">
+      <div class="settings">
+        <label>Reihen (2–15)
+          <input id="rows" type="number" min="2" max="15" value="5">
+        </label>
+        <label>Spalten (2–15)
+          <input id="cols" type="number" min="2" max="15" value="7">
+        </label>
       </div>
-    </section>
-
-    <!-- SPIELMODUS -->
-    <section id="mode" class="hidden">
-      <button class="back" id="modeBack">← Alle Spiele</button>
-      <div class="eyebrow">Spiel auswählen</div>
-      <h1 id="modeTitle">Schokoladenspiel</h1>
-      <p>Wie möchtest du spielen?</p>
-
-      <div class="grid">
-        <button class="card" id="localMode">
-          <span class="game-icon">👥</span>
-          <strong>Zu zweit</strong>
-          <p>Zwei Spieler an einem Gerät.</p>
-        </button>
-
-        <button class="card" id="botMode">
-          <span class="game-icon">🤖</span>
-          <strong>Gegen Bot</strong>
-          <p>Mehrere Schwierigkeitsgrade kommen später.</p>
-        </button>
-
-        <button class="card" id="onlineMode" disabled>
-          <span class="game-icon">🌐</span>
-          <strong>Online per Code</strong>
-          <p>Noch in Entwicklung.</p>
-        </button>
-      </div>
-
-      <div id="modeNotice" class="notice hidden"></div>
-    </section>
-
-    <!-- SPIELVORBEREITUNG -->
-    <section id="setup" class="hidden">
-      <button class="back" id="setupBack">← Spielmodus</button>
-      <div class="eyebrow">Spiel vorbereiten</div>
-      <h1>Schokoladenspiel</h1>
-      <p>Lege die Größe des Spielfeldes fest.</p>
-
-      <div class="panel">
-        <div class="settings">
-          <label>
-            Reihen (2–15)
-            <input id="rows" type="number" min="2" max="15"
-              value="5" step="1">
-          </label>
-          <label>
-            Spalten (2–15)
-            <input id="cols" type="number" min="2" max="15"
-              value="7" step="1">
-          </label>
-        </div>
-        <p class="small">
-          Standard: 5 Reihen und 7 Spalten.
-          Größere Bretter können horizontal scrollen.
-        </p>
-        <div id="setupError" class="notice hidden"></div>
-        <div class="button-row">
-          <button class="primary" id="startGame">Spiel starten</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SPIELBRETT -->
-    <section id="play" class="hidden">
-      <button class="back" id="playBack">← Spielmenü</button>
-      <div class="eyebrow">Schokoladenspiel · Lokal</div>
-      <h1>Die Schokolade</h1>
-      <p class="muted small">
-        Wähle ein Stück. Es und alle Stücke darüber
-        und rechts davon verschwinden.
-      </p>
-
-      <div class="status" id="status" aria-live="polite"></div>
-
-      <div class="board-wrap">
-        <div class="board" id="board"
-          role="group" aria-label="Schokoladenspielfeld"></div>
-      </div>
-
+      <p class="small">Standard: 5 Reihen und 7 Spalten.</p>
+      <div id="setupError" class="notice hidden"></div>
       <div class="button-row">
-        <button class="primary" id="restart">Neue Partie</button>
-        <button class="secondary" id="changeSize">Größe ändern</button>
+        <button class="primary" id="startGame">Spiel starten</button>
       </div>
+    </div>
+  </section>
 
-      <div class="panel">
-        <h2>Spielregeln</h2>
-        <ol class="rules">
-          <li>Zwei Spieler wechseln sich ab.</li>
-          <li>Ein Zug entfernt das gewählte Stück sowie alle Stücke
-              darüber und rechts davon.</li>
-          <li>Das Giftfeld unten links darf erst gewählt werden,
-              wenn es das letzte verbliebene Stück ist.</li>
-          <li>Wer das Giftstück antippen muss, verliert.</li>
-        </ol>
-      </div>
-    </section>
+  <!-- SCHOKOLADENSPIEL -->
+  <section id="play" class="hidden">
+    <button class="back" id="playBack">← Spielmenü</button>
+    <div class="eyebrow">Schokoladenspiel · Lokal</div>
+    <h1>Die Schokolade</h1>
+    <p class="small">Wähle ein Stück. Es und alle Stücke darüber und rechts davon verschwinden.</p>
 
-    <!-- TIC-TAC-TOE -->
-    <section id="ticTacToe" class="hidden">
-      <button class="back" id="ticBack">← Spielmenü</button>
-      <div class="eyebrow">Tic-Tac-Toe</div>
-      <h1>Dein Zug.</h1>
-      <p id="ticStatus">Spieler X ist an der Reihe.</p>
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="board-wrap">
+      <div class="board" id="board" role="group" aria-label="Schokoladenspielfeld"></div>
+    </div>
 
-      <div id="ticBoard" class="tic-board">
-        <button class="tic-cell" data-cell="0"></button>
-        <button class="tic-cell" data-cell="1"></button>
-        <button class="tic-cell" data-cell="2"></button>
-        <button class="tic-cell" data-cell="3"></button>
-        <button class="tic-cell" data-cell="4"></button>
-        <button class="tic-cell" data-cell="5"></button>
-        <button class="tic-cell" data-cell="6"></button>
-        <button class="tic-cell" data-cell="7"></button>
-        <button class="tic-cell" data-cell="8"></button>
-      </div>
+    <div class="button-row">
+      <button class="primary" id="restart">Neue Partie</button>
+      <button class="secondary" id="changeSize">Größe ändern</button>
+    </div>
 
-      <button id="ticRestart">Neue Runde</button>
-    </section>
+    <div class="panel">
+      <h2>Spielregeln</h2>
+      <ol class="rules">
+        <li>Zwei Spieler wechseln sich ab.</li>
+        <li>Ein Zug entfernt das gewählte Stück sowie alle Stücke darüber und rechts davon.</li>
+        <li>Wer das Giftstück antippen muss, verliert.</li>
+      </ol>
+    </div>
+  </section>
 
-    <!-- ANDERE SPIELE -->
-    <section id="coming" class="hidden">
-      <button class="back" id="comingBack">← Alle Spiele</button>
-      <div class="eyebrow">In Entwicklung</div>
-      <h1 id="comingTitle">Dieses Spiel kommt bald.</h1>
-      <p>
-        Wir entwickeln jedes Spiel einzeln und ergänzen
-        anschließend Bots und Online-Partien.
-      </p>
-    </section>
+  <!-- TIC-TAC-TOE -->
+  <section id="ticTacToe" class="hidden">
+    <button class="back" id="ticBack">← Spielmenü</button>
+    <div class="eyebrow">Tic-Tac-Toe · Lokal</div>
+    <h1>Tic-Tac-Toe</h1>
+    <p>Abwechselnd setzen. Wer zuerst drei Zeichen in einer Reihe hat, gewinnt.</p>
 
-    <footer>Spielraum · Version 0.3</footer>
-  </main>
+    <div id="ticStatus" class="status" aria-live="polite">Spieler X ist am Zug.</div>
 
-  <script>
-    
-const screens = {
-  home: document.getElementById("home"),
-  mode: document.getElementById("mode"),
-  setup: document.getElementById("setup"),
-  play: document.getElementById("play"),
-  ticTacToe: document.getElementById("ticTacToe"),
-  coming: document.getElementById("coming")
-};
+    <div id="ticBoard" class="tic-board" role="group" aria-label="Tic-Tac-Toe-Spielfeld">
+      <button class="tic-cell" data-cell="0" aria-label="Feld 1"></button>
+      <button class="tic-cell" data-cell="1" aria-label="Feld 2"></button>
+      <button class="tic-cell" data-cell="2" aria-label="Feld 3"></button>
+      <button class="tic-cell" data-cell="3" aria-label="Feld 4"></button>
+      <button class="tic-cell" data-cell="4" aria-label="Feld 5"></button>
+      <button class="tic-cell" data-cell="5" aria-label="Feld 6"></button>
+      <button class="tic-cell" data-cell="6" aria-label="Feld 7"></button>
+      <button class="tic-cell" data-cell="7" aria-label="Feld 8"></button>
+      <button class="tic-cell" data-cell="8" aria-label="Feld 9"></button>
+    </div>
 
-    const modeTitle = document.getElementById("modeTitle");
-    const modeNotice = document.getElementById("modeNotice");
-    const boardElement = document.getElementById("board");
-    const statusElement = document.getElementById("status");
-    const rowsInput = document.getElementById("rows");
-    const colsInput = document.getElementById("cols");
+    <button id="ticRestart" class="primary">Neue Runde</button>
+  </section>
 
-    let rows = 5;
-    let cols = 7;
-    let alive = [];
-    let currentPlayer = 1;
-    let finished = false;
-    let selectedGame = "chocolate";
+  <!-- NOCH NICHT VERFÜGBARE SPIELE -->
+  <section id="coming" class="hidden">
+    <button class="back" id="comingBack">← Alle Spiele</button>
+    <div class="eyebrow">In Entwicklung</div>
+    <h1 id="comingTitle">Dieses Spiel kommt bald.</h1>
+    <p>Wir entwickeln jedes Spiel einzeln und ergänzen anschließend weitere Modi.</p>
+  </section>
 
-    // TIC-TAC-TOE: SPIELLOGIK
-    const ticCells = document.querySelectorAll(".tic-cell");
-    const ticStatus = document.getElementById("ticStatus");
+  <footer>Spielraum · Version 0.4</footer>
+</main>
 
-    let ticBoard = Array(9).fill("");
-    let ticCurrent = "X";
-    let ticFinished = false;
+<script>
+  const screens = {
+    home: document.getElementById("home"),
+    mode: document.getElementById("mode"),
+    setup: document.getElementById("setup"),
+    play: document.getElementById("play"),
+    ticTacToe: document.getElementById("ticTacToe"),
+    coming: document.getElementById("coming")
+  };
 
-    const ticWinPatterns = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6]
-    ];
+  const modeTitle = document.getElementById("modeTitle");
+  const modeNotice = document.getElementById("modeNotice");
+  const boardElement = document.getElementById("board");
+  const statusElement = document.getElementById("status");
+  const rowsInput = document.getElementById("rows");
+  const colsInput = document.getElementById("cols");
 
-    function ticNewGame() {
-      ticBoard = Array(9).fill("");
-      ticCurrent = "X";
-      ticFinished = false;
-      ticRender();
-    }
+  let selectedGame = "chocolate";
 
-    function ticRender() {
-      ticCells.forEach((cell, index) => {
-        cell.textContent = ticBoard[index];
-        cell.disabled = ticFinished || ticBoard[index] !== "";
-        cell.setAttribute(
-          "aria-label",
-          ticBoard[index]
-            ? `Feld ${index + 1}: ${ticBoard[index]}`
-            : `Feld ${index + 1}: leer`
-        );
-      });
+  function showScreen(name) {
+    Object.values(screens).forEach(screen => screen.classList.add("hidden"));
+    screens[name].classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
 
-      if (!ticFinished) {
-        ticStatus.textContent = `Spieler ${ticCurrent} ist am Zug.`;
-      }
-    }
+  // Navigation: Jedes Spiel öffnet zunächst sein Spielmenü.
+  document.querySelectorAll("[data-game]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedGame = button.dataset.game;
 
-    function ticPlay(index) {
-      if (ticFinished || ticBoard[index] !== "") return;
-
-      ticBoard[index] = ticCurrent;
-
-      const won = ticWinPatterns.some(pattern =>
-        pattern.every(position => ticBoard[position] === ticCurrent)
-      );
-
-      if (won) {
-        ticFinished = true;
-        ticRender();
-        ticStatus.textContent = `Spieler ${ticCurrent} gewinnt!`;
+      if (selectedGame === "connect4") {
+        document.getElementById("comingTitle").textContent = "Vier Gewinnt";
+        showScreen("coming");
         return;
       }
 
-      if (ticBoard.every(cell => cell !== "")) {
-        ticFinished = true;
-        ticRender();
-        ticStatus.textContent = "Unentschieden!";
-        return;
-      }
+      modeTitle.textContent =
+        selectedGame === "tictactoe" ? "Tic-Tac-Toe" : "Schokoladenspiel";
 
-      ticCurrent = ticCurrent === "X" ? "O" : "X";
-      ticRender();
-    }
-
-    ticCells.forEach((cell, index) => {
-      cell.addEventListener("click", () => ticPlay(index));
+      modeNotice.classList.add("hidden");
+      showScreen("mode");
     });
+  });
 
-    document.getElementById("ticRestart").addEventListener(
-      "click",
-      ticNewGame
-    );
+  document.getElementById("modeBack").addEventListener("click", () => showScreen("home"));
+  document.getElementById("comingBack").addEventListener("click", () => showScreen("home"));
 
-    document.getElementById("ticBack").addEventListener(
-      "click",
-      () => showScreen("home")
-    );
+  document.getElementById("localMode").addEventListener("click", () => {
+    modeNotice.classList.add("hidden");
 
-    ticRender();
-
-    function showScreen(name) {
-      Object.values(screens).forEach(screen => {
-        screen.classList.add("hidden");
-      });
-      screens[name].classList.remove("hidden");
-      window.scrollTo(0, 0);
-    }
-
-    document.querySelectorAll("[data-game]").forEach(button => {
-      button.addEventListener("click", () => {
-        selectedGame = button.dataset.game;
-
-        if (selectedGame !== "chocolate") {
-          document.getElementById("comingTitle").textContent =
-            selectedGame === "tictactoe"
-              ? "Tic-Tac-Toe"
-              : "Vier Gewinnt";
-          showScreen("coming");
-          return;
-        }
-
-        modeTitle.textContent = "Schokoladenspiel";
-        modeNotice.classList.add("hidden");
-        showScreen("mode");
-      });
-    });
-
-    document.getElementById("modeBack").addEventListener("click", () => {
-      showScreen("home");
-    });
-
-    document.getElementById("comingBack").addEventListener("click", () => {
-      showScreen("home");
-    });
-
-    document.getElementById("localMode").addEventListener("click", () => {
+    if (selectedGame === "tictactoe") {
+      ticNewGame();
+      showScreen("ticTacToe");
+    } else {
       document.getElementById("setupError").classList.add("hidden");
       showScreen("setup");
-    });
+    }
+  });
 
-    document.getElementById("botMode").addEventListener("click", () => {
-      modeNotice.textContent =
-        "Der Bot ist noch nicht eingebaut. Zunächst entwickeln wir " +
-        "das lokale Spiel; danach ergänzen wir die Bot-Stufen.";
-      modeNotice.classList.remove("hidden");
-    });
+  document.getElementById("botMode").addEventListener("click", () => {
+    modeNotice.textContent =
+      "Der Bot ist noch in Entwicklung. Im Modus „Zu zweit“ kannst du bereits spielen.";
+    modeNotice.classList.remove("hidden");
+  });
 
-    document.getElementById("setupBack").addEventListener("click", () => {
-      showScreen("mode");
-    });
+  document.getElementById("onlineMode").addEventListener("click", () => {});
 
-    document.getElementById("playBack").addEventListener("click", () => {
-      showScreen("mode");
-    });
+  document.getElementById("setupBack").addEventListener("click", () => showScreen("mode"));
+  document.getElementById("playBack").addEventListener("click", () => showScreen("mode"));
+  document.getElementById("changeSize").addEventListener("click", () => {
+    rowsInput.value = rows;
+    colsInput.value = cols;
+    showScreen("setup");
+  });
 
-    document.getElementById("changeSize").addEventListener("click", () => {
-      rowsInput.value = rows;
-      colsInput.value = cols;
-      showScreen("setup");
-    });
+  // SCHOKOLADENSPIEL
+  let rows = 5;
+  let cols = 7;
+  let alive = [];
+  let currentPlayer = 1;
+  let finished = false;
 
-    document.getElementById("startGame").addEventListener("click", () => {
-      const newRows = Number(rowsInput.value);
-      const newCols = Number(colsInput.value);
-      const error = document.getElementById("setupError");
+  document.getElementById("startGame").addEventListener("click", () => {
+    const newRows = Number(rowsInput.value);
+    const newCols = Number(colsInput.value);
+    const error = document.getElementById("setupError");
 
-      if (
-        !Number.isInteger(newRows) ||
-        !Number.isInteger(newCols) ||
-        newRows < 2 || newRows > 15 ||
-        newCols < 2 || newCols > 15
-      ) {
-        error.textContent =
-          "Bitte gib für Reihen und Spalten ganze Zahlen von 2 bis 15 ein.";
-        error.classList.remove("hidden");
-        return;
-      }
-
-      rows = newRows;
-      cols = newCols;
-      newGame();
-      showScreen("play");
-    });
-
-    function newGame() {
-      alive = Array.from(
-        { length: rows },
-        () => Array(cols).fill(true)
-      );
-      currentPlayer = 1;
-      finished = false;
-      render();
+    if (!Number.isInteger(newRows) || !Number.isInteger(newCols) ||
+        newRows < 2 || newRows > 15 || newCols < 2 || newCols > 15) {
+      error.textContent = "Bitte gib ganze Zahlen von 2 bis 15 ein.";
+      error.classList.remove("hidden");
+      return;
     }
 
-    function render() {
-      boardElement.innerHTML = "";
-      boardElement.style.gridTemplateColumns =
-        `repeat(${cols}, max-content)`;
+    rows = newRows;
+    cols = newCols;
+    error.classList.add("hidden");
+    newGame();
+    showScreen("play");
+  });
 
-      const remaining = alive.flat().filter(Boolean).length;
-      const poisonIsLast = remaining === 1 &&
-        alive[rows - 1][0];
+  function newGame() {
+    alive = Array.from({ length: rows }, () => Array(cols).fill(true));
+    currentPlayer = 1;
+    finished = false;
+    renderChocolate();
+  }
 
-      if (finished) {
-        statusElement.textContent =
-          `Spieler ${currentPlayer} hat das Giftstück gegessen und verloren. ` +
-          `Spieler ${currentPlayer === 1 ? 2 : 1} gewinnt!`;
-      } else if (poisonIsLast) {
-        statusElement.textContent =
-          `Spieler ${currentPlayer} ist am Zug. ` +
-          "Nur noch das Giftstück ist übrig. Wer es antippt, verliert.";
-      } else {
-        statusElement.textContent =
-          `Spieler ${currentPlayer} ist am Zug.`;
-      }
+  function renderChocolate() {
+    boardElement.innerHTML = "";
+    boardElement.style.gridTemplateColumns = `repeat(${cols}, max-content)`;
 
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const cell = document.createElement("button");
-          cell.type = "button";
-          cell.className = "cell";
+    const remaining = alive.flat().filter(Boolean).length;
+    const poisonIsLast = remaining === 1 && alive[rows - 1][0];
 
-          const poison = r === rows - 1 && c === 0;
+    if (finished) {
+      statusElement.textContent =
+        `Spieler ${currentPlayer} hat das Giftstück gegessen und verloren. ` +
+        `Spieler ${currentPlayer === 1 ? 2 : 1} gewinnt!`;
+    } else if (poisonIsLast) {
+      statusElement.textContent =
+        `Spieler ${currentPlayer} ist am Zug. Nur das Giftstück ist übrig. Wer es antippt, verliert.`;
+    } else {
+      statusElement.textContent = `Spieler ${currentPlayer} ist am Zug.`;
+    }
 
-          if (!alive[r][c]) {
-            cell.classList.add("gone");
-            cell.disabled = true;
-            cell.setAttribute("aria-hidden", "true");
-          } else if (poison) {
-            cell.classList.add("poison");
-            cell.textContent = "☠";
-            cell.setAttribute("aria-label", "Giftstück");
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "cell";
+        const poison = r === rows - 1 && c === 0;
 
-            // Das Giftstück ist nur anklickbar, wenn es
-            // das letzte verbliebene Stück ist.
-            cell.disabled = finished || !poisonIsLast;
-
-            if (poisonIsLast && !finished) {
-              cell.title = "Giftstück antippen und verlieren";
-              cell.addEventListener("click", () => makeMove(r, c));
-            } else {
-              cell.title = "Das Giftstück darf nicht direkt gewählt werden";
-            }
-          } else {
-            cell.textContent = "▰";
-            cell.setAttribute(
-              "aria-label",
-              `Reihe ${r + 1}, Spalte ${c + 1}`
-            );
-            cell.disabled = finished;
-            cell.addEventListener("click", () => makeMove(r, c));
+        if (!alive[r][c]) {
+          cell.classList.add("gone");
+          cell.disabled = true;
+          cell.setAttribute("aria-hidden", "true");
+        } else if (poison) {
+          cell.classList.add("poison");
+          cell.textContent = "☠";
+          cell.setAttribute("aria-label", "Giftstück");
+          cell.disabled = finished || !poisonIsLast;
+          if (poisonIsLast && !finished) {
+            cell.addEventListener("click", () => chocolateMove(r, c));
           }
-
-          boardElement.appendChild(cell);
+        } else {
+          cell.textContent = "▰";
+          cell.setAttribute("aria-label", `Reihe ${r + 1}, Spalte ${c + 1}`);
+          cell.disabled = finished;
+          cell.addEventListener("click", () => chocolateMove(r, c));
         }
+
+        boardElement.appendChild(cell);
       }
     }
+  }
 
-    function makeMove(r, c) {
-      if (finished || !alive[r][c]) return;
+  function chocolateMove(r, c) {
+    if (finished || !alive[r][c]) return;
 
-      const poison = r === rows - 1 && c === 0;
-
-      if (poison) {
-        const remaining = alive.flat().filter(Boolean).length;
-        if (remaining !== 1) return;
-
-        // Der Spieler am Zug nimmt das letzte Giftstück
-        // und verliert. Der Gewinner ist der andere Spieler.
-        finished = true;
-        render();
-        return;
-      }
-
-      // Entferne das gewählte Stück sowie alle Stücke
-      // darüber und rechts davon.
-      for (let rr = 0; rr <= r; rr++) {
-        for (let cc = c; cc < cols; cc++) {
-          alive[rr][cc] = false;
-        }
-      }
-
-      // Der nächste Spieler ist an der Reihe.
-      currentPlayer = currentPlayer === 1 ? 2 : 1;
-      render();
+    if (r === rows - 1 && c === 0) {
+      if (alive.flat().filter(Boolean).length !== 1) return;
+      finished = true;
+      renderChocolate();
+      return;
     }
 
-    document.getElementById("restart").addEventListener("click", newGame);
-  </script>
+    for (let rr = 0; rr <= r; rr++) {
+      for (let cc = c; cc < cols; cc++) alive[rr][cc] = false;
+    }
+
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    renderChocolate();
+  }
+
+  document.getElementById("restart").addEventListener("click", newGame);
+
+  // TIC-TAC-TOE
+  const ticCells = document.querySelectorAll(".tic-cell");
+  const ticStatus = document.getElementById("ticStatus");
+
+  let ticBoard = Array(9).fill("");
+  let ticCurrent = "X";
+  let ticFinished = false;
+
+  const ticWinPatterns = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6]
+  ];
+
+  function ticNewGame() {
+    ticBoard = Array(9).fill("");
+    ticCurrent = "X";
+    ticFinished = false;
+    ticRender();
+  }
+
+  function ticRender() {
+    ticCells.forEach((cell, index) => {
+      cell.textContent = ticBoard[index];
+      cell.disabled = ticFinished || ticBoard[index] !== "";
+      cell.setAttribute("aria-label",
+        `Feld ${index + 1}${ticBoard[index] ? ": " + ticBoard[index] : ": leer"}`);
+    });
+
+    if (!ticFinished) ticStatus.textContent = `Spieler ${ticCurrent} ist am Zug.`;
+  }
+
+  function ticPlay(index) {
+    if (ticFinished || ticBoard[index] !== "") return;
+
+    ticBoard[index] = ticCurrent;
+
+    const won = ticWinPatterns.some(pattern =>
+      pattern.every(position => ticBoard[position] === ticCurrent)
+    );
+
+    if (won) {
+      ticFinished = true;
+      ticRender();
+      ticStatus.textContent = `Spieler ${ticCurrent} gewinnt!`;
+      return;
+    }
+
+    if (ticBoard.every(cell => cell !== "")) {
+      ticFinished = true;
+      ticRender();
+      ticStatus.textContent = "Unentschieden!";
+      return;
+    }
+
+    ticCurrent = ticCurrent === "X" ? "O" : "X";
+    ticRender();
+  }
+
+  ticCells.forEach((cell, index) => {
+    cell.addEventListener("click", () => ticPlay(index));
+  });
+
+  document.getElementById("ticRestart").addEventListener("click", ticNewGame);
+  document.getElementById("ticBack").addEventListener("click", () => showScreen("mode"));
+
+  ticRender();
+</script>
 </body>
 </html>
