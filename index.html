@@ -2,677 +2,566 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10131c">
-  <title>Spielraum</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111318">
+<title>Spielraum</title>
 
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #10131c;
-      --panel: #191e2b;
-      --border: #30384b;
-      --text: #f3f5fb;
-      --muted: #9ca7bc;
-      --accent: #a697ff;
-      --danger: #ff7784;
-    }
+<style>
+:root {
+  --bg: #111318;
+  --panel: #1b1e26;
+  --panel2: #252935;
+  --text: #f2f3f7;
+  --muted: #a4a9b8;
+  --accent: #a9a4ff;
+  --border: #343846;
+  --red: #ff626b;
+  --yellow: #ffd45e;
+  --green: #8ce0b0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+header {
+  padding: 22px 6%;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo { font-weight: 800; font-size: 1.35rem; letter-spacing: -.5px; }
+.logo span { color: var(--accent); }
+.version { color: var(--muted); font-size: .8rem; }
+main { width: min(900px, 92%); margin: 36px auto 60px; }
+h1 { font-size: clamp(2rem, 6vw, 3rem); margin: 0 0 10px; letter-spacing: -1px; }
+h2 { margin-top: 0; }
+p { line-height: 1.55; }
+.muted { color: var(--muted); }
+.hidden { display: none !important; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+.game-card {
+  text-align: left;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel);
+  color: var(--text);
+  min-height: 160px;
+  transition: border-color .15s, transform .15s;
+}
+.game-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.game-icon { font-size: 2rem; margin-bottom: 16px; }
+.game-card h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.game-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  margin-top: 22px;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.btn {
+  background: var(--accent);
+  color: #171625;
+  border: 0;
+  border-radius: 11px;
+  padding: 12px 17px;
+  font-weight: 700;
+}
+.btn.secondary {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+label { display: block; margin: 16px 0 7px; color: var(--muted); }
+input {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  width: 100%;
+  max-width: 180px;
+}
+.status {
+  margin: 18px 0;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+}
+.board-wrap { display: flex; justify-content: center; width: 100%; }
+.tic-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 100px));
+  gap: 8px;
+  justify-content: center;
+  margin: 22px auto;
+}
+.tic-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 13px;
+  color: var(--text);
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+.tic-cell.x { color: var(--accent); }
+.tic-cell.o { color: var(--green); }
 
-    * { box-sizing: border-box; }
+/* Schokoladenspiel */
+.choc-board {
+  display: grid;
+  gap: 5px;
+  width: min(100%, 480px);
+  margin: 22px auto;
+}
+.choc-piece {
+  aspect-ratio: 1.3;
+  min-width: 0;
+  border: 1px solid #8d5c3e;
+  background: #925b3d;
+  border-radius: 5px;
+  padding: 0;
+}
+.choc-piece:hover { background: #b8794f; }
+.choc-piece.poison { background: #6d2938; border-color: #c35a70; }
+.choc-piece.gone { visibility: hidden; pointer-events: none; }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-    }
-
-    button, input { font: inherit; }
-    button { cursor: pointer; }
-
-    button:focus-visible, input:focus-visible {
-      outline: 3px solid var(--accent);
-      outline-offset: 3px;
-    }
-
-    .app {
-      width: min(100% - 28px, 850px);
-      margin: auto;
-      padding: 24px 0 44px;
-    }
-
-    .brand {
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 34px;
-    }
-
-    .eyebrow {
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 750;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 10px 0;
-      font-size: clamp(34px, 7vw, 52px);
-      letter-spacing: -1.5px;
-      line-height: 1.1;
-    }
-
-    h2 { margin: 0 0 10px; font-size: 21px; }
-    p { color: var(--muted); line-height: 1.65; }
-    .small { font-size: 13px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 28px;
-    }
-
-    .card {
-      min-width: 0;
-      padding: 20px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--panel);
-      color: var(--text);
-      text-align: left;
-    }
-
-    .card:hover {
-      background: #242b3b;
-      border-color: #55506f;
-    }
-
-    .game-icon {
-      display: block;
-      margin-bottom: 20px;
-      font-size: 30px;
-    }
-
-    .card p { margin-bottom: 0; font-size: 13px; }
-
-    .panel {
-      margin-top: 22px;
-      padding: 20px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--panel);
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .primary, .secondary {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-weight: 700;
-    }
-
-    .primary {
-      background: var(--accent);
-      color: #17142a;
-    }
-
-    .secondary {
-      background: #292f40;
-      color: var(--text);
-    }
-
-    .back {
-      border: 0;
-      padding: 0;
-      background: transparent;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-
-    .hidden { display: none !important; }
-
-    .settings {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      align-items: end;
-      margin-top: 22px;
-    }
-
-    .settings label {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    input[type="number"] {
-      width: 100px;
-      padding: 11px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .status, .notice {
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 12px;
-      background: #25223a;
-      line-height: 1.6;
-    }
-
-    .board-wrap {
-      overflow-x: auto;
-      padding: 6px 0 14px;
-      margin-top: 14px;
-    }
-
-    .board {
-      display: grid;
-      gap: 5px;
-      width: max-content;
-      margin: 0 auto;
-    }
-
-    .cell {
-      display: grid;
-      place-items: center;
-      width: clamp(32px, 6.8vw, 58px);
-      height: clamp(32px, 6.8vw, 58px);
-      padding: 0;
-      border: 0;
-      border-radius: 8px;
-      background: #a96a43;
-      color: #fff2df;
-      font-size: clamp(15px, 3vw, 23px);
-      box-shadow: inset 0 -4px rgba(65, 35, 20, .22);
-    }
-
-    .cell:not(:disabled):hover {
-      background: #ca895b;
-      transform: scale(1.04);
-    }
-
-    .cell.poison {
-      background: var(--danger);
-      color: #2c1019;
-    }
-
-    .cell.gone {
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .rules {
-      padding-left: 20px;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    /* Tic-Tac-Toe */
-    .tic-board {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      width: 100%;
-      max-width: 360px;
-      margin: 24px auto;
-    }
-
-    .tic-cell {
-      aspect-ratio: 1;
-      min-width: 0;
-      padding: 0;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--panel);
-      color: var(--text);
-      font-size: clamp(2.5rem, 12vw, 4rem);
-      font-weight: 700;
-    }
-
-    .tic-cell:not(:disabled):hover {
-      background: #242b3b;
-      border-color: var(--accent);
-    }
-
-    .tic-cell:disabled { cursor: default; }
-
-    #ticRestart { display: block; margin: 0 auto; }
-
-    footer {
-      margin-top: 38px;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-    }
-
-    @media (max-width: 620px) {
-      .grid { grid-template-columns: 1fr; }
-
-      .card {
-        display: grid;
-        grid-template-columns: 48px 1fr;
-        column-gap: 12px;
-        padding: 16px;
-      }
-
-      .game-icon {
-        grid-row: span 2;
-        margin: 0;
-      }
-
-      .card p { margin-top: 4px; }
-      .panel { padding: 16px; }
-    }
-  </style>
+/* Vier Gewinnt */
+.connect-board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(4px, 1.3vw, 10px);
+  width: min(100%, 490px);
+  padding: clamp(7px, 2vw, 13px);
+  background: #315fbd;
+  border-radius: 15px;
+  border: 1px solid #4e7fe0;
+  margin: 18px auto;
+}
+.column-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 50%;
+}
+.column-button:disabled { cursor: default; }
+.connect-cell {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #171c2a;
+  border: 2px solid rgba(0,0,0,.15);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.25);
+}
+.connect-cell.red { background: var(--red); }
+.connect-cell.yellow { background: var(--yellow); }
+.column-button:not(:disabled):hover .connect-cell.empty {
+  background: #566b99;
+}
+.player-red { color: var(--red); }
+.player-yellow { color: var(--yellow); }
+footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 6%;
+  color: var(--muted);
+  font-size: .8rem;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  header { padding: 18px 5%; }
+  main { margin-top: 28px; }
+  .panel { padding: 16px; }
+}
+</style>
 </head>
 
 <body>
-<main class="app">
-  <div class="brand">Spielraum</div>
+<header>
+  <div class="logo">Spiel<span>raum</span></div>
+  <div class="version">Version 0.5</div>
+</header>
 
-  <!-- STARTSEITE -->
+<main>
   <section id="home">
-    <div class="eyebrow">Dein nächstes Spiel wartet</div>
-    <h1>Einfach spielen.</h1>
-    <p>Entdecke Spiele, fordere Freunde heraus und verbessere deine Strategien.</p>
+    <h1>Dein Spielraum.</h1>
+    <p class="muted">Kleine Spiele, große Herausforderungen.</p>
 
-    <div class="grid">
-      <button class="card" data-game="chocolate">
-        <span class="game-icon">🍫</span>
-        <strong>Schokoladenspiel</strong>
-        <p>Wähle mit Bedacht. Meide das Giftfeld.</p>
+    <div class="cards">
+      <button class="game-card" data-game="chocolate">
+        <div class="game-icon">🍫</div>
+        <h3>Schokolade</h3>
+        <p>Entferne Stücke, aber vermeide das letzte Giftstück.</p>
       </button>
-
-      <button class="card" data-game="tictactoe">
-        <span class="game-icon">✕ ○</span>
-        <strong>Tic-Tac-Toe</strong>
-        <p>Drei in einer Reihe.</p>
+      <button class="game-card" data-game="tictactoe">
+        <div class="game-icon">⭕</div>
+        <h3>Tic-Tac-Toe</h3>
+        <p>Drei in einer Reihe. Einfach zu lernen, schwer zu meistern.</p>
       </button>
-
-      <button class="card" data-game="connect4">
-        <span class="game-icon">🔴</span>
-        <strong>Vier Gewinnt</strong>
-        <p>Verbinde vier Steine.</p>
+      <button class="game-card" data-game="connect4">
+        <div class="game-icon">🔴</div>
+        <h3>Vier Gewinnt</h3>
+        <p>Verbinde vier Steine, bevor es dein Gegner tut.</p>
       </button>
     </div>
   </section>
 
-  <!-- SPIELMODUS -->
   <section id="mode" class="hidden">
-    <button class="back" id="modeBack">← Alle Spiele</button>
-    <div class="eyebrow">Spiel auswählen</div>
-    <h1 id="modeTitle">Schokoladenspiel</h1>
-    <p>Wie möchtest du spielen?</p>
-
-    <div class="grid">
-      <button class="card" id="localMode">
-        <span class="game-icon">👥</span>
-        <strong>Zu zweit</strong>
-        <p>Zwei Spieler an einem Gerät.</p>
-      </button>
-
-      <button class="card" id="botMode">
-        <span class="game-icon">🤖</span>
-        <strong>Gegen Bot</strong>
-        <p>Schwierigkeitsgrade folgen später.</p>
-      </button>
-
-      <button class="card" id="onlineMode" disabled>
-        <span class="game-icon">🌐</span>
-        <strong>Online per Code</strong>
-        <p>Noch in Entwicklung.</p>
-      </button>
+    <button class="btn secondary" id="modeBack">← Zurück</button>
+    <div class="panel">
+      <h1 id="modeTitle">Spiel</h1>
+      <p class="muted">Wie möchtest du spielen?</p>
+      <div class="actions">
+        <button class="btn" id="localMode">Zwei Spieler · ein Gerät</button>
+      </div>
+      <p class="muted">Weitere Spielmodi wie Computergegner und Online-Partien können später ergänzt werden.</p>
     </div>
-
-    <div id="modeNotice" class="notice hidden"></div>
   </section>
 
-  <!-- SCHOKOLADENSPIEL EINSTELLUNGEN -->
-  <section id="setup" class="hidden">
-    <button class="back" id="setupBack">← Spielmodus</button>
-    <div class="eyebrow">Spiel vorbereiten</div>
-    <h1>Schokoladenspiel</h1>
-    <p>Lege die Größe des Spielfeldes fest.</p>
-
+  <section id="chocolateSetup" class="hidden">
+    <button class="btn secondary" id="setupBack">← Zurück</button>
     <div class="panel">
-      <div class="settings">
-        <label>Reihen (2–15)
-          <input id="rows" type="number" min="2" max="15" value="5">
-        </label>
-        <label>Spalten (2–15)
-          <input id="cols" type="number" min="2" max="15" value="7">
-        </label>
-      </div>
-      <p class="small">Standard: 5 Reihen und 7 Spalten.</p>
-      <div id="setupError" class="notice hidden"></div>
-      <div class="button-row">
-        <button class="primary" id="startGame">Spiel starten</button>
+      <h1>Schokolade</h1>
+      <p class="muted">Stelle das Spielfeld ein.</p>
+      <label for="chocRows">Reihen (2–15)</label>
+      <input id="chocRows" type="number" min="2" max="15" value="5">
+      <label for="chocCols">Spalten (2–15)</label>
+      <input id="chocCols" type="number" min="2" max="15" value="7">
+      <div class="actions">
+        <button class="btn" id="startChocolate">Spiel starten</button>
       </div>
     </div>
   </section>
 
-  <!-- SCHOKOLADENSPIEL -->
-  <section id="play" class="hidden">
-    <button class="back" id="playBack">← Spielmenü</button>
-    <div class="eyebrow">Schokoladenspiel · Lokal</div>
-    <h1>Die Schokolade</h1>
-    <p class="small">Wähle ein Stück. Es und alle Stücke darüber und rechts davon verschwinden.</p>
-
-    <div class="status" id="status" aria-live="polite"></div>
-    <div class="board-wrap">
-      <div class="board" id="board" role="group" aria-label="Schokoladenspielfeld"></div>
-    </div>
-
-    <div class="button-row">
-      <button class="primary" id="restart">Neue Partie</button>
-      <button class="secondary" id="changeSize">Größe ändern</button>
-    </div>
-
-    <div class="panel">
-      <h2>Spielregeln</h2>
-      <ol class="rules">
-        <li>Zwei Spieler wechseln sich ab.</li>
-        <li>Ein Zug entfernt das gewählte Stück sowie alle Stücke darüber und rechts davon.</li>
-        <li>Wer das Giftstück antippen muss, verliert.</li>
-      </ol>
+  <section id="chocolate" class="hidden">
+    <button class="btn secondary" id="chocBack">← Spielauswahl</button>
+    <h1 style="margin-top:22px">Schokolade</h1>
+    <p class="muted">Wähle ein Stück. Es und alle Stücke oberhalb sowie rechts davon werden entfernt. Das Giftstück liegt links unten.</p>
+    <div class="status" id="chocStatus" aria-live="polite"></div>
+    <div class="choc-board" id="chocBoard"></div>
+    <div class="actions">
+      <button class="btn" id="restartChocolate">Neu starten</button>
     </div>
   </section>
 
-  <!-- TIC-TAC-TOE -->
   <section id="ticTacToe" class="hidden">
-    <button class="back" id="ticBack">← Spielmenü</button>
-    <div class="eyebrow">Tic-Tac-Toe · Lokal</div>
-    <h1>Tic-Tac-Toe</h1>
-    <p>Abwechselnd setzen. Wer zuerst drei Zeichen in einer Reihe hat, gewinnt.</p>
-
-    <div id="ticStatus" class="status" aria-live="polite">Spieler X ist am Zug.</div>
-
-    <div id="ticBoard" class="tic-board" role="group" aria-label="Tic-Tac-Toe-Spielfeld">
-      <button class="tic-cell" data-cell="0" aria-label="Feld 1"></button>
-      <button class="tic-cell" data-cell="1" aria-label="Feld 2"></button>
-      <button class="tic-cell" data-cell="2" aria-label="Feld 3"></button>
-      <button class="tic-cell" data-cell="3" aria-label="Feld 4"></button>
-      <button class="tic-cell" data-cell="4" aria-label="Feld 5"></button>
-      <button class="tic-cell" data-cell="5" aria-label="Feld 6"></button>
-      <button class="tic-cell" data-cell="6" aria-label="Feld 7"></button>
-      <button class="tic-cell" data-cell="7" aria-label="Feld 8"></button>
-      <button class="tic-cell" data-cell="8" aria-label="Feld 9"></button>
+    <button class="btn secondary" id="ticBack">← Spielauswahl</button>
+    <h1 style="margin-top:22px">Tic-Tac-Toe</h1>
+    <div class="status" id="ticStatus" aria-live="polite"></div>
+    <div class="board-wrap">
+      <div class="tic-board" id="ticBoard">
+        <button class="tic-cell" data-cell="0" aria-label="Feld 1"></button>
+        <button class="tic-cell" data-cell="1" aria-label="Feld 2"></button>
+        <button class="tic-cell" data-cell="2" aria-label="Feld 3"></button>
+        <button class="tic-cell" data-cell="3" aria-label="Feld 4"></button>
+        <button class="tic-cell" data-cell="4" aria-label="Feld 5"></button>
+        <button class="tic-cell" data-cell="5" aria-label="Feld 6"></button>
+        <button class="tic-cell" data-cell="6" aria-label="Feld 7"></button>
+        <button class="tic-cell" data-cell="7" aria-label="Feld 8"></button>
+        <button class="tic-cell" data-cell="8" aria-label="Feld 9"></button>
+      </div>
     </div>
-
-    <button id="ticRestart" class="primary">Neue Runde</button>
+    <div class="actions">
+      <button class="btn" id="restartTic">Neu starten</button>
+    </div>
   </section>
 
-  <!-- NOCH NICHT VERFÜGBARE SPIELE -->
-  <section id="coming" class="hidden">
-    <button class="back" id="comingBack">← Alle Spiele</button>
-    <div class="eyebrow">In Entwicklung</div>
-    <h1 id="comingTitle">Dieses Spiel kommt bald.</h1>
-    <p>Wir entwickeln jedes Spiel einzeln und ergänzen anschließend weitere Modi.</p>
+  <section id="connect4" class="hidden">
+    <button class="btn secondary" id="connectBack">← Spielauswahl</button>
+    <h1 style="margin-top:22px">Vier Gewinnt</h1>
+    <p class="muted">Tippe auf eine Spalte, um deinen Stein einzuwerfen.</p>
+    <div class="status" id="connectStatus" aria-live="polite"></div>
+    <div class="connect-board" id="connectBoard" aria-label="Vier-Gewinnt-Spielfeld"></div>
+    <div class="actions">
+      <button class="btn" id="restartConnect">Neu starten</button>
+    </div>
   </section>
-
-  <footer>Spielraum · Version 0.4</footer>
 </main>
 
+<footer>Spielraum · Spiele gemeinsam, entdecke Strategien und hab Spaß.</footer>
+
 <script>
-  const screens = {
-    home: document.getElementById("home"),
-    mode: document.getElementById("mode"),
-    setup: document.getElementById("setup"),
-    play: document.getElementById("play"),
-    ticTacToe: document.getElementById("ticTacToe"),
-    coming: document.getElementById("coming")
+const screens = [
+  "home", "mode", "chocolateSetup", "chocolate", "ticTacToe", "connect4"
+];
+let selectedGame = "chocolate";
+
+function showScreen(id) {
+  screens.forEach(screen => {
+    document.getElementById(screen).classList.toggle("hidden", screen !== id);
+  });
+  window.scrollTo(0, 0);
+}
+function openMode(game) {
+  selectedGame = game;
+  const names = {
+    chocolate: "Schokolade",
+    tictactoe: "Tic-Tac-Toe",
+    connect4: "Vier Gewinnt"
   };
-
-  const modeTitle = document.getElementById("modeTitle");
-  const modeNotice = document.getElementById("modeNotice");
-  const boardElement = document.getElementById("board");
-  const statusElement = document.getElementById("status");
-  const rowsInput = document.getElementById("rows");
-  const colsInput = document.getElementById("cols");
-
-  let selectedGame = "chocolate";
-
-  function showScreen(name) {
-    Object.values(screens).forEach(screen => screen.classList.add("hidden"));
-    screens[name].classList.remove("hidden");
-    window.scrollTo(0, 0);
+  document.getElementById("modeTitle").textContent = names[game];
+  showScreen("mode");
+}
+document.querySelectorAll("[data-game]").forEach(button => {
+  button.addEventListener("click", () => openMode(button.dataset.game));
+});
+document.getElementById("modeBack").addEventListener("click", () => showScreen("home"));
+document.getElementById("localMode").addEventListener("click", () => {
+  if (selectedGame === "chocolate") showScreen("chocolateSetup");
+  if (selectedGame === "tictactoe") {
+    resetTic();
+    showScreen("ticTacToe");
   }
+  if (selectedGame === "connect4") {
+    resetConnect();
+    showScreen("connect4");
+  }
+});
+document.getElementById("setupBack").addEventListener("click", () => showScreen("mode"));
+document.getElementById("chocBack").addEventListener("click", () => showScreen("mode"));
+document.getElementById("ticBack").addEventListener("click", () => showScreen("mode"));
+document.getElementById("connectBack").addEventListener("click", () => showScreen("mode"));
 
-  // Navigation: Jedes Spiel öffnet zunächst sein Spielmenü.
-  document.querySelectorAll("[data-game]").forEach(button => {
-    button.addEventListener("click", () => {
-      selectedGame = button.dataset.game;
+/* Schokolade */
+let chocRows = 5, chocCols = 7, chocPieces = [], chocPlayer = 1, chocFinished = false;
 
-      if (selectedGame === "connect4") {
-        document.getElementById("comingTitle").textContent = "Vier Gewinnt";
-        showScreen("coming");
-        return;
-      }
+function resetChocolate() {
+  const rowsInput = document.getElementById("chocRows");
+  const colsInput = document.getElementById("chocCols");
+  chocRows = Math.max(2, Math.min(15, Number(rowsInput.value) || 5));
+  chocCols = Math.max(2, Math.min(15, Number(colsInput.value) || 7));
+  rowsInput.value = chocRows;
+  colsInput.value = chocCols;
+  chocPieces = Array.from({length: chocRows}, () => Array(chocCols).fill(true));
+  chocPlayer = 1;
+  chocFinished = false;
+  renderChocolate();
+  showScreen("chocolate");
+}
+function renderChocolate() {
+  const board = document.getElementById("chocBoard");
+  board.innerHTML = "";
+  board.style.gridTemplateColumns = `repeat(${chocCols}, minmax(0, 1fr))`;
+  const remaining = chocPieces.flat().filter(Boolean).length;
 
-      modeTitle.textContent =
-        selectedGame === "tictactoe" ? "Tic-Tac-Toe" : "Schokoladenspiel";
-
-      modeNotice.classList.add("hidden");
-      showScreen("mode");
-    });
-  });
-
-  document.getElementById("modeBack").addEventListener("click", () => showScreen("home"));
-  document.getElementById("comingBack").addEventListener("click", () => showScreen("home"));
-
-  document.getElementById("localMode").addEventListener("click", () => {
-    modeNotice.classList.add("hidden");
-
-    if (selectedGame === "tictactoe") {
-      ticNewGame();
-      showScreen("ticTacToe");
+  chocPieces.forEach((row, r) => row.forEach((exists, c) => {
+    const button = document.createElement("button");
+    button.className = "choc-piece";
+    button.setAttribute("aria-label", `Reihe ${r + 1}, Spalte ${c + 1}`);
+    if (!exists) {
+      button.classList.add("gone");
+      button.disabled = true;
+    } else if (r === chocRows - 1 && c === 0) {
+      button.classList.add("poison");
+      button.setAttribute("aria-label", "Giftstück");
+      button.disabled = remaining !== 1 || chocFinished;
+      button.addEventListener("click", () => {
+        if (chocFinished || remaining !== 1) return;
+        chocFinished = true;
+        renderChocolate();
+      });
     } else {
-      document.getElementById("setupError").classList.add("hidden");
-      showScreen("setup");
+      button.disabled = chocFinished;
+      button.addEventListener("click", () => makeChocolateMove(r, c));
     }
-  });
+    board.appendChild(button);
+  }));
 
-  document.getElementById("botMode").addEventListener("click", () => {
-    modeNotice.textContent =
-      "Der Bot ist noch in Entwicklung. Im Modus „Zu zweit“ kannst du bereits spielen.";
-    modeNotice.classList.remove("hidden");
-  });
-
-  document.getElementById("onlineMode").addEventListener("click", () => {});
-
-  document.getElementById("setupBack").addEventListener("click", () => showScreen("mode"));
-  document.getElementById("playBack").addEventListener("click", () => showScreen("mode"));
-  document.getElementById("changeSize").addEventListener("click", () => {
-    rowsInput.value = rows;
-    colsInput.value = cols;
-    showScreen("setup");
-  });
-
-  // SCHOKOLADENSPIEL
-  let rows = 5;
-  let cols = 7;
-  let alive = [];
-  let currentPlayer = 1;
-  let finished = false;
-
-  document.getElementById("startGame").addEventListener("click", () => {
-    const newRows = Number(rowsInput.value);
-    const newCols = Number(colsInput.value);
-    const error = document.getElementById("setupError");
-
-    if (!Number.isInteger(newRows) || !Number.isInteger(newCols) ||
-        newRows < 2 || newRows > 15 || newCols < 2 || newCols > 15) {
-      error.textContent = "Bitte gib ganze Zahlen von 2 bis 15 ein.";
-      error.classList.remove("hidden");
-      return;
+  const status = document.getElementById("chocStatus");
+  if (chocFinished) {
+    status.textContent = `Spiel vorbei! Spieler ${chocPlayer} hat das Giftstück genommen. Spieler ${chocPlayer === 1 ? 2 : 1} gewinnt!`;
+  } else {
+    status.textContent = `Spieler ${chocPlayer} ist am Zug.`;
+  }
+}
+function makeChocolateMove(r, c) {
+  if (chocFinished || !chocPieces[r][c]) return;
+  for (let rr = 0; rr <= r; rr++) {
+    for (let cc = c; cc < chocCols; cc++) {
+      chocPieces[rr][cc] = false;
     }
+  }
+  chocPlayer = chocPlayer === 1 ? 2 : 1;
+  renderChocolate();
+}
+document.getElementById("startChocolate").addEventListener("click", resetChocolate);
+document.getElementById("restartChocolate").addEventListener("click", resetChocolate);
 
-    rows = newRows;
-    cols = newCols;
-    error.classList.add("hidden");
-    newGame();
-    showScreen("play");
+/* Tic-Tac-Toe */
+let ticCells = Array(9).fill("");
+let ticPlayer = "X";
+let ticFinished = false;
+const ticWins = [
+  [0,1,2], [3,4,5], [6,7,8],
+  [0,3,6], [1,4,7], [2,5,8],
+  [0,4,8], [2,4,6]
+];
+const ticButtons = [...document.querySelectorAll(".tic-cell")];
+
+function resetTic() {
+  ticCells = Array(9).fill("");
+  ticPlayer = "X";
+  ticFinished = false;
+  renderTic();
+}
+function renderTic() {
+  ticButtons.forEach((button, i) => {
+    button.textContent = ticCells[i];
+    button.classList.toggle("x", ticCells[i] === "X");
+    button.classList.toggle("o", ticCells[i] === "O");
+    button.disabled = ticFinished || ticCells[i] !== "";
   });
+  document.getElementById("ticStatus").textContent =
+    ticFinished ? "Partie beendet." : `Spieler ${ticPlayer} ist am Zug.`;
+}
+function playTic(index) {
+  if (ticFinished || ticCells[index]) return;
+  ticCells[index] = ticPlayer;
+  const winner = ticWins.some(line => line.every(i => ticCells[i] === ticPlayer));
+  if (winner) {
+    ticFinished = true;
+    renderTic();
+    document.getElementById("ticStatus").textContent = `Spieler ${ticPlayer} gewinnt!`;
+    return;
+  }
+  if (ticCells.every(cell => cell !== "")) {
+    ticFinished = true;
+    renderTic();
+    document.getElementById("ticStatus").textContent = "Unentschieden!";
+    return;
+  }
+  ticPlayer = ticPlayer === "X" ? "O" : "X";
+  renderTic();
+}
+ticButtons.forEach((button, i) => button.addEventListener("click", () => playTic(i)));
+document.getElementById("restartTic").addEventListener("click", resetTic);
 
-  function newGame() {
-    alive = Array.from({ length: rows }, () => Array(cols).fill(true));
-    currentPlayer = 1;
-    finished = false;
-    renderChocolate();
+/* Vier Gewinnt: klassisches Brett mit 7 Spalten und 6 Reihen */
+const CONNECT_ROWS = 6;
+const CONNECT_COLS = 7;
+let connectCells = [];
+let connectPlayer = "R";
+let connectFinished = false;
+
+function resetConnect() {
+  connectCells = Array.from({length: CONNECT_ROWS}, () => Array(CONNECT_COLS).fill(""));
+  connectPlayer = "R";
+  connectFinished = false;
+  renderConnect();
+}
+function renderConnect() {
+  const board = document.getElementById("connectBoard");
+  board.innerHTML = "";
+
+  for (let c = 0; c < CONNECT_COLS; c++) {
+    const columnButton = document.createElement("button");
+    columnButton.className = "column-button";
+    columnButton.type = "button";
+    columnButton.setAttribute("aria-label", `Stein in Spalte ${c + 1} werfen`);
+    columnButton.disabled = connectFinished || connectCells[0][c] !== "";
+    columnButton.addEventListener("click", () => playConnect(c));
+
+    for (let r = 0; r < CONNECT_ROWS; r++) {
+      const cell = document.createElement("span");
+      cell.className = "connect-cell";
+      if (connectCells[r][c] === "R") cell.classList.add("red");
+      if (connectCells[r][c] === "Y") cell.classList.add("yellow");
+      if (connectCells[r][c] === "") cell.classList.add("empty");
+      columnButton.appendChild(cell);
+    }
+    board.appendChild(columnButton);
   }
 
-  function renderChocolate() {
-    boardElement.innerHTML = "";
-    boardElement.style.gridTemplateColumns = `repeat(${cols}, max-content)`;
-
-    const remaining = alive.flat().filter(Boolean).length;
-    const poisonIsLast = remaining === 1 && alive[rows - 1][0];
-
-    if (finished) {
-      statusElement.textContent =
-        `Spieler ${currentPlayer} hat das Giftstück gegessen und verloren. ` +
-        `Spieler ${currentPlayer === 1 ? 2 : 1} gewinnt!`;
-    } else if (poisonIsLast) {
-      statusElement.textContent =
-        `Spieler ${currentPlayer} ist am Zug. Nur das Giftstück ist übrig. Wer es antippt, verliert.`;
-    } else {
-      statusElement.textContent = `Spieler ${currentPlayer} ist am Zug.`;
-    }
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const cell = document.createElement("button");
-        cell.type = "button";
-        cell.className = "cell";
-        const poison = r === rows - 1 && c === 0;
-
-        if (!alive[r][c]) {
-          cell.classList.add("gone");
-          cell.disabled = true;
-          cell.setAttribute("aria-hidden", "true");
-        } else if (poison) {
-          cell.classList.add("poison");
-          cell.textContent = "☠";
-          cell.setAttribute("aria-label", "Giftstück");
-          cell.disabled = finished || !poisonIsLast;
-          if (poisonIsLast && !finished) {
-            cell.addEventListener("click", () => chocolateMove(r, c));
-          }
-        } else {
-          cell.textContent = "▰";
-          cell.setAttribute("aria-label", `Reihe ${r + 1}, Spalte ${c + 1}`);
-          cell.disabled = finished;
-          cell.addEventListener("click", () => chocolateMove(r, c));
-        }
-
-        boardElement.appendChild(cell);
+  const status = document.getElementById("connectStatus");
+  if (connectFinished) {
+    // Der Spieltext wird direkt beim Spielende gesetzt.
+    return;
+  }
+  status.innerHTML = connectPlayer === "R"
+    ? '<span class="player-red">Rot</span> ist am Zug.'
+    : '<span class="player-yellow">Gelb</span> ist am Zug.';
+}
+function hasFourFrom(r, c, player) {
+  const directions = [[0,1], [1,0], [1,1], [1,-1]];
+  for (const [dr, dc] of directions) {
+    let count = 1;
+    for (const sign of [-1, 1]) {
+      let rr = r + dr * sign;
+      let cc = c + dc * sign;
+      while (
+        rr >= 0 && rr < CONNECT_ROWS &&
+        cc >= 0 && cc < CONNECT_COLS &&
+        connectCells[rr][cc] === player
+      ) {
+        count++;
+        rr += dr * sign;
+        cc += dc * sign;
       }
     }
+    if (count >= 4) return true;
   }
+  return false;
+}
+function playConnect(col) {
+  if (connectFinished || connectCells[0][col] !== "") return;
 
-  function chocolateMove(r, c) {
-    if (finished || !alive[r][c]) return;
-
-    if (r === rows - 1 && c === 0) {
-      if (alive.flat().filter(Boolean).length !== 1) return;
-      finished = true;
-      renderChocolate();
-      return;
+  let row = -1;
+  for (let r = CONNECT_ROWS - 1; r >= 0; r--) {
+    if (connectCells[r][col] === "") {
+      row = r;
+      break;
     }
+  }
+  if (row === -1) return;
 
-    for (let rr = 0; rr <= r; rr++) {
-      for (let cc = c; cc < cols; cc++) alive[rr][cc] = false;
-    }
-
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
-    renderChocolate();
+  connectCells[row][col] = connectPlayer;
+  if (hasFourFrom(row, col, connectPlayer)) {
+    connectFinished = true;
+    renderConnect();
+    document.getElementById("connectStatus").innerHTML =
+      connectPlayer === "R"
+        ? '<span class="player-red">Rot gewinnt!</span>'
+        : '<span class="player-yellow">Gelb gewinnt!</span>';
+    return;
   }
 
-  document.getElementById("restart").addEventListener("click", newGame);
-
-  // TIC-TAC-TOE
-  const ticCells = document.querySelectorAll(".tic-cell");
-  const ticStatus = document.getElementById("ticStatus");
-
-  let ticBoard = Array(9).fill("");
-  let ticCurrent = "X";
-  let ticFinished = false;
-
-  const ticWinPatterns = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],
-    [0, 4, 8], [2, 4, 6]
-  ];
-
-  function ticNewGame() {
-    ticBoard = Array(9).fill("");
-    ticCurrent = "X";
-    ticFinished = false;
-    ticRender();
+  if (connectCells.every(line => line.every(cell => cell !== ""))) {
+    connectFinished = true;
+    renderConnect();
+    document.getElementById("connectStatus").textContent = "Unentschieden!";
+    return;
   }
 
-  function ticRender() {
-    ticCells.forEach((cell, index) => {
-      cell.textContent = ticBoard[index];
-      cell.disabled = ticFinished || ticBoard[index] !== "";
-      cell.setAttribute("aria-label",
-        `Feld ${index + 1}${ticBoard[index] ? ": " + ticBoard[index] : ": leer"}`);
-    });
+  connectPlayer = connectPlayer === "R" ? "Y" : "R";
+  renderConnect();
+}
+document.getElementById("restartConnect").addEventListener("click", resetConnect);
 
-    if (!ticFinished) ticStatus.textContent = `Spieler ${ticCurrent} ist am Zug.`;
-  }
-
-  function ticPlay(index) {
-    if (ticFinished || ticBoard[index] !== "") return;
-
-    ticBoard[index] = ticCurrent;
-
-    const won = ticWinPatterns.some(pattern =>
-      pattern.every(position => ticBoard[position] === ticCurrent)
-    );
-
-    if (won) {
-      ticFinished = true;
-      ticRender();
-      ticStatus.textContent = `Spieler ${ticCurrent} gewinnt!`;
-      return;
-    }
-
-    if (ticBoard.every(cell => cell !== "")) {
-      ticFinished = true;
-      ticRender();
-      ticStatus.textContent = "Unentschieden!";
-      return;
-    }
-
-    ticCurrent = ticCurrent === "X" ? "O" : "X";
-    ticRender();
-  }
-
-  ticCells.forEach((cell, index) => {
-    cell.addEventListener("click", () => ticPlay(index));
-  });
-
-  document.getElementById("ticRestart").addEventListener("click", ticNewGame);
-  document.getElementById("ticBack").addEventListener("click", () => showScreen("mode"));
-
-  ticRender();
+/* Startseite beim Öffnen anzeigen */
+showScreen("home");
 </script>
 </body>
 </html>
