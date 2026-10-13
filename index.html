@@ -164,6 +164,20 @@ button.primary{background:#8ee3bd;border-color:#8ee3bd;color:#11251d}
 .chomp-finish.draw { background:#303747; border-color:#7b8498; color:#f4f5fa; }
 
 </style></head><body>
+  
+<!-- Eigenes Icon für iPad und iPhone -->
+<link rel="apple-touch-icon" href="./apple-touch-icon.jpeg">
+
+<!-- Web-App-Einstellungen für iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Meine App">
+
+<!-- PWA-Manifest -->
+<link rel="manifest" href="./manifest.json">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <header><div class="brand"><div class="brandmark">S</div><div><h1>Spielraum</h1><p>Version 1.4 · Deine Spiele, dein Fortschritt</p></div></div><div class="head-actions"><div class="profile-chip"><div class="avatar" id="headerAvatar">?</div><strong id="headerName">Spieler</strong></div><button class="ghost" onclick="showView('profiles')">Profile wechseln</button><button class="ghost" onclick="showView('progress')">Fortschritt</button></div></header>
 <main>
 <section id="home" class="view active"><div class="hero"><div class="eyebrow">Willkommen im</div><h2>2-Spieler-Raum!</h2></div><div class="section-head"><div><h2>Spiele</h2></div></div><div class="cards"><article class="game-card"><div class="game-icon">🍫</div><h3>Schokolade</h3><button class="primary" onclick="openChompSetup()">Spielen</button></article><article class="game-card"><div class="game-icon">⭕</div><h3>Tic-Tac-Toe</h3><button class="primary" onclick="openTTTSetup()">Spielen</button></article><article class="game-card"><div class="game-icon">🔴</div><h3>Vier Gewinnt</h3><button class="primary" onclick="openConnectSetup()">Spielen</button></article></div><div class="section-head"><div><h2>Dein Überblick</h2></div><button onclick="showView('progress')">Alle Statistiken</button></div><div class="stats-grid" id="homeStats"></div><div class="section-head"><div><h2>Zuletzt freigeschaltet</h2></div></div><div id="homeTrophies" class="trophy-grid"></div></section>
