@@ -1,0 +1,17 @@
+
+{
+  "name": "Meine App",
+  "short_name": "Meine App",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "./apple-touch-icon.jpeg",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
